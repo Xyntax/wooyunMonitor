@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import requests
 import re
+import os
 from mail.sendmail import send_mail
 
 baseURL = 'http://www.wooyun.org/market/'
@@ -17,7 +18,7 @@ mail_list = [
 
 
 def marketMonitor():
-    log_file = 'wooyun-market-log'
+    log_file = os.path.join(os.path.split(os.path.realpath(__file__))[0],'wooyun-market-log')
     f = open(log_file, 'r')
     log_p = f.readline().strip()
     p = int(log_p) if log_p else START
