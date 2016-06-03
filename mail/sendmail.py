@@ -10,7 +10,7 @@ def send_mail(title='default_title', content='default_content',
               to_list=list()):
     mail_host = "smtp.163.com"  # TODO 替换成自己的smtp服务器
     mail_user = "xyntax@163.com"  # TODO 替换成自己的邮箱
-    mail_pass = "**********"  # TODO 替换成自己的密码(第三方授权密码，和登录密码不同)
+    mail_pass = "xxx"  # TODO 替换成自己的密码(第三方授权密码，和登录密码不同)
     me = "xyntax@163.com"  # TODO 替换成自己的邮箱
     msg = MIMEText(content, _subtype='html', _charset='gb2312')
     msg['Subject'] = title

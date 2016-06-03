@@ -4,24 +4,22 @@ import re
 import os
 from mail.sendmail import send_mail
 
-baseURL = 'http://www.wooyun.org/market/'
-
+# baseURL = 'http://www.wooyun.org/market/'
+# fleaURL = 'http://www.wooyun.org/flea/'
 h = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:46.0) Gecko/20100101 Firefox/46.0'
 }
 
-START = 408
-
 mail_list = [
-    'xxxxxx@qq.com',  # TODO 这里应替换成自己的qq邮箱，这样就能在微信里看到通知
+    'xxxx@qq.com',  # TODO 这里应替换成自己的qq邮箱，这样就能在微信里看到通知
 ]
 
 
-def marketMonitor():
-    log_file = os.path.join(os.path.split(os.path.realpath(__file__))[0],'wooyun-market-log')
+def marketMonitor(baseURL, fileName):
+    log_file = os.path.join(os.path.split(os.path.realpath(__file__))[0], fileName)
     f = open(log_file, 'r')
     log_p = f.readline().strip()
-    p = int(log_p) if log_p else START
+    p = int(log_p)
     f.close()
 
     count = 0
@@ -29,23 +27,24 @@ def marketMonitor():
     found = False
 
     # 提取信息
-    par = r'<td valign="top" style="padding-left:20px">\s*?<h2>((\s|\S)*?)</h2>\s*?<p>((\s|\S)*?)</p>\s*?<p>((\s|\S)*?)</p>\s*?<p>((\s|\S)*?)</p>'
+    par = r'<td valign="top" style="padding-left:20px">\s*?<h2>([\s|\S]*?)</h2>\s*?<p>([\s|\S]*?)</p>\s*?<p>([\s|\S]*?)</p>\s*?<p>([\s|\S]*?)</p>'
 
     while (1):
         p += 1
         count += 1
         url = baseURL + str(p)
-        c = requests.get(url=url, headers=h).content
-        if count > 1000:
+        c = requests.get(url=url, headers=h).content.decode('utf-8').replace('\n', '')
+        if count > 100:
             needUpdate()
             break
-        if '奖品不存在' in c:
+        if '<p><a href="/index.php">' in c:
             break
-        elif '<div class="reward_view">' in c:
+        elif '<span class="num">' in c:
             found = True
             mail_msg += '<p>' + url + '<br>'
             for each in re.findall(par, c)[0]:
-                mail_msg += each.decode('utf-8') + '<br>'
+                print each
+                mail_msg += each + '<br>'
             mail_msg += '--------------</p>'
             print p
         else:
@@ -66,6 +65,5 @@ def needUpdate():
     send_mail(title='[!]wooyunMonitor-needUpdate', content=mail_msg, to_list=['xyntax@163.com'])
     return
 
-
-if __name__ == '__main__':
-    marketMonitor()
+# if __name__ == '__main__':
+#     marketMonitor('http://www.wooyun.org/market/', 'wooyun-market-log')
